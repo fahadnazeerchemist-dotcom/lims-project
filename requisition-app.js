@@ -62,6 +62,13 @@ const requisitionApp = (() => {
             closeAllLists();
           }
         });
+
+        // FIX: ROBUST PRINT CLEANUP
+        window.addEventListener('afterprint', () => {
+            if (document.body.classList.contains('is-printing-req')) {
+                document.body.classList.remove('is-printing-req');
+            }
+        });
     }
 
     function setCurrentDate() {
@@ -89,7 +96,6 @@ const requisitionApp = (() => {
         const tbody = document.getElementById('itemDetailsBody');
         const newRow = tbody.insertRow();
         newRow.id = `itemRow_${itemRowCount}`;
-        // FIX: REMOVED INLINE oninput HANDLER
         newRow.innerHTML = `
             <td>${tbody.rows.length}</td>
             <td>
@@ -119,11 +125,24 @@ const requisitionApp = (() => {
         const input = document.getElementById(`itemDescription_${rowIndex}`);
         const searchTerm = input.value.trim().toLowerCase();
         const autocompleteList = document.getElementById(`autocomplete-list_${rowIndex}`);
-        autocompleteList.innerHTML = "";
+        
         closeAllLists(rowIndex);
-        if (!searchTerm) return false;
+
+        // FIX: EXPLICITLY HIDE THE BOX IF THE INPUT IS EMPTY
+        if (!searchTerm) {
+            autocompleteList.innerHTML = "";
+            autocompleteList.style.display = "none";
+            return;
+        }
+
         const matchingItems = Object.keys(approvedItems).filter(item => item.toLowerCase().includes(searchTerm));
-        if (matchingItems.length === 0) { autocompleteList.style.display = "none"; return; }
+        if (matchingItems.length === 0) {
+            autocompleteList.innerHTML = "";
+            autocompleteList.style.display = "none";
+            return;
+        }
+
+        autocompleteList.innerHTML = ""; // Clear previous results
         autocompleteList.style.display = "block";
         matchingItems.forEach(item => {
             const itemDiv = document.createElement("DIV");
@@ -259,9 +278,9 @@ const requisitionApp = (() => {
     }
 
     function printRequisition() {
+        // The afterprint event listener will handle removing the class
         document.body.classList.add('is-printing-req');
         window.print();
-        document.body.classList.remove('is-printing-req');
     }
 
     return { init };
