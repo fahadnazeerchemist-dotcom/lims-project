@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MISAQ PHARMACEUTICALS - LIMS (Validated)</title>
-    <!-- External Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Your Custom Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,7 +17,6 @@
         <button class="tab-button active" data-tab="daily-activity"><i class="fas fa-calendar-day"></i> Daily Activity Report</button>
         <button class="tab-button" data-tab="sterility-log"><i class="fas fa-vial-virus"></i> Sterility Test Log</button>
         <button class="tab-button" data-tab="lab-ledger"><i class="fas fa-book"></i> Lab Chemical Ledger</button>
-        <!-- NEW TABS ADDED HERE -->
         <button class="tab-button" data-tab="label-generator"><i class="fas fa-tags"></i> Label Generator</button>
         <button class="tab-button" data-tab="purchase-requisition"><i class="fas fa-shopping-cart"></i> Purchase Requisition</button>
     </div>
@@ -100,7 +97,7 @@
         </table>
     </div>
 
-    <!-- NEW: LABEL GENERATOR TAB -->
+    <!-- LABEL GENERATOR TAB -->
     <div id="label-generator-content" class="tab-content">
         <div id="main-container" class="container">
             <h1>Advanced QC Pharmaceutical Label Generator</h1>
@@ -231,12 +228,11 @@
                 <button id="generate-tags">Generate Tags</button>
             </div>
         </div>
-        <div id="print-area-tags"></div>
     </div>
 
-    <!-- NEW: PURCHASE REQUISITION TAB -->
+    <!-- PURCHASE REQUISITION TAB -->
     <div id="purchase-requisition-content" class="tab-content">
-        <div id="print-area-req">
+       <div class="requisition-form-container">
             <div class="requisition-form" id="purchaseRequisitionForm">
               <h2>LAB PURCHASE REQUISITION</h2>
               <div class="form-group full-width">
@@ -292,7 +288,6 @@
               </div>
             </div>
         </div>
-          <!-- History Section -->
         <div class="history-section no-print">
             <h2>Purchase Requisition History</h2>
             <table id="historyTable-req">
@@ -301,7 +296,6 @@
             </table>
         </div>
     </div>
-
 </div>
 
 <!-- All Modals for all tabs -->
@@ -358,9 +352,7 @@
                 <div class="full-width"><label>Batch Number (of Product)</label><input type="text" id="batchNumber" placeholder="e.g., PC2025-001" required></div>
             </div>
             <h3 style="margin-top:20px;">Chemicals Used</h3>
-            <div id="chemical-entry-container">
-                <!-- Chemical entry rows will be dynamically added by JS -->
-            </div>
+            <div id="chemical-entry-container"></div>
             <button type="button" id="addChemicalRowBtn" class="add-btn"><i class="fas fa-plus"></i> Add More Chemicals</button>
             <div style="margin-top:20px;"></div>
             <button type="submit" class="primary-action-btn" style="width:100%;">Submit & Deduct All</button>
@@ -409,6 +401,9 @@
     <option value="100g"></option><option value="500g"></option><option value="1kg"></option><option value="5kg"></option><option value="250ml"></option><option value="500ml"></option><option value="1L"></option><option value="2.5L"></option><option value="4L"></option><option value="Pack of 10"></option><option value="Pack of 50"></option><option value="Pack of 100"></option><option value="Pack of 500"></option><option value="Roll (10m)"></option><option value="Roll (50m)"></option>
 </datalist>
 
+<!-- NEW DEDICATED PRINT CONTAINER -->
+<div id="print-container"></div>
+
 <!-- Scripts -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -416,7 +411,6 @@
 <script src="firebase-config.js"></script>
 <script src="ledger-app.js"></script>
 <script src="report-app.js"></script>
-<!-- NEW SCRIPT FILES -->
 <script src="tags-app.js"></script>
 <script src="requisition-app.js"></script>
 <script src="main.js"></script>
