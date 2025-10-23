@@ -1,5 +1,4 @@
 const tagsApp = (() => {
-    // --- EVENT LISTENERS SETUP ---
     function setupEventListeners() {
         document.getElementById('label-type').addEventListener('change', toggleFormVisibility);
         document.getElementById('tag-status').addEventListener('change', updateThemeAndRemarks);
@@ -15,8 +14,6 @@ const tagsApp = (() => {
         document.getElementById('btn-save-history').addEventListener('click', saveToHistory);
         document.getElementById('btn-load-history').addEventListener('click', loadFromHistory);
         document.getElementById('btn-delete-history').addEventListener('click', deleteFromHistory);
-
-        window.addEventListener('afterprint', cleanupAfterPrint);
     }
     
     function parseTagNumbers(inputString) {
@@ -246,16 +243,10 @@ const tagsApp = (() => {
              if (containerNum > totalContainers || containerNum < 1) continue;
             tagsHtml += buildTagHtml(labelType, data, tagStatus, sopNumber, companyLogo, containerNum, totalContainers);
         }
-        document.body.classList.add('is-printing-tags');
-        document.getElementById('print-area-tags').innerHTML = `<div class="print-container">${tagsHtml}</div>`;
+        
+        const printContainer = document.getElementById('print-container');
+        printContainer.innerHTML = `<div class="print-container-tags">${tagsHtml}</div>`; 
         window.print();
-    }
-
-    function cleanupAfterPrint() {
-        if (document.body.classList.contains('is-printing-tags')) {
-            document.body.classList.remove('is-printing-tags');
-            document.getElementById('print-area-tags').innerHTML = '';
-        }
     }
     
     function buildTagHtml(type, data, status, sop, companyLogo, currentContainer, totalContainers) {
