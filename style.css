@@ -30,7 +30,7 @@ body {
     display: flex;
     background-color: #f9f9f9;
     border-bottom: 1px solid var(--border-color);
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
 }
 .tab-button {
     padding: 15px 25px;
@@ -187,7 +187,6 @@ input:read-only, select:disabled { background-color: #e9ecef; cursor: not-allowe
 .master-inventory-row.expanded .expand-icon::before { content: '\f146'; color: var(--danger-color); }
 .batch-details-row td:first-child { padding-left: 30px; }
 
-
 /* ======================================================== */
 /* ========= SCOPED STYLES FOR LABEL GENERATOR ============ */
 /* ======================================================== */
@@ -224,9 +223,6 @@ input:read-only, select:disabled { background-color: #e9ecef; cursor: not-allowe
 #label-generator-content #btn-save-history { background-color: #17a2b8; }
 #label-generator-content #btn-load-history { background-color: #6c757d; }
 #label-generator-content #btn-delete-history { background-color: #e55353; }
-#label-generator-content .hidden { display: none; }
-#print-area-tags { display: none; }
-
 
 /* ========================================================== */
 /* ========= SCOPED STYLES FOR PURCHASE REQUISITION ================ */
@@ -263,9 +259,8 @@ input:read-only, select:disabled { background-color: #e9ecef; cursor: not-allowe
 #purchase-requisition-content .add-row-btn { margin-top: 15px; float: right; }
 #purchase-requisition-content .table-container { position: relative; overflow: hidden; padding-bottom: 45px; }
 #purchase-requisition-content .autocomplete-container { position: relative; width: 100%; }
-/* FIX: HIDE AUTOCOMPLETE BOX BY DEFAULT */
 #purchase-requisition-content .autocomplete-items {
-    display: none; /* <-- FIX IS HERE */
+    display: none; /* Hides box by default */
     position: absolute; border: 1px solid #d4d4d4; border-bottom: none; border-top: none; z-index: 99;
     top: 100%; left: 0; right: 0; max-height: 150px; overflow-y: auto; background-color: white;
 }
@@ -275,104 +270,83 @@ input:read-only, select:disabled { background-color: #e9ecef; cursor: not-allowe
 #purchase-requisition-content button.secondary { background-color: var(--secondary-color); }
 #purchase-requisition-content button.primary { background-color: var(--primary-color); }
 
+/* ======================================================== */
+/* =========== NEW ROBUST PRINTING STYLES ================= */
+/* ======================================================== */
 
-/* ======================================================== */
-/* =================== PRINT STYLES ======================= */
-/* ======================================================== */
-@media print {
-    body { font-size: 11pt; background-color: #fff; }
-    .no-print { display: none !important; }
-    .app-container { box-shadow: none; border: none; }
-    
-    /* --- General Report Print Styles --- */
-    #daily-activity-content, #sterility-log-content, #lab-ledger-content {
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .header-container {
-        padding: 0 0 5px 0; margin-bottom: 8px; border-bottom: 1px solid #000;
-        text-align: center; color: #000; background: none;
-    }
-    #company-name, .header-container h2, .header-container h3 { color: #000; background: none; margin: 0; padding: 0; }
-    #company-name { font-size: 16pt; font-weight: bold; }
-    .header-container h2 { font-size: 13pt; }
-    .header-container h3 { font-size: 11pt; font-weight: bold; }
-    .print-only { display: block; }
-    #print-report-date-container { text-align: right; font-size: 10pt; font-weight: bold; margin-bottom: 8px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 5px; table-layout: auto; }
-    tr { page-break-inside: avoid; }
-    th, td { border: 1px solid #333 !important; color: #000; font-size: 8.5pt; padding: 2px 3px; line-height: 1.1; background-color: #fff !important; word-wrap: break-word; }
-    th { font-weight: bold; background-color: #e0e0e0 !important; }
-    .section-header th { font-size: 10pt; text-align: center; }
-    .signature-section { display: flex; justify-content: space-around; margin-top: 15px; page-break-inside: avoid; }
-    .signature-block { text-align: center; width: 200px; font-size: 10pt; }
-    .signature-line { border-bottom: 1px solid #000; height: 35px; margin-bottom: 5px; }
-    .ledger-add { background-color: #e6ffed !important; }
-    .ledger-subtract { background-color: #ffe6e6 !important; }
+/* Hide the dedicated print container on the screen */
+#print-container {
+    display: none;
 }
 
-/* --- FIX: ROBUST PRINTING FOR TAGS AND REQUISITION --- */
 @media print {
-    /* HIDE EVERYTHING EXCEPT THE INTENDED PRINT AREA */
-    body.is-printing-tags > *,
-    body.is-printing-req > * {
+    /* Hide everything in the body by default */
+    body > * {
         display: none !important;
     }
-    body.is-printing-tags #print-area-tags,
-    body.is-printing-tags #print-area-tags *,
-    body.is-printing-req #print-area-req,
-    body.is-printing-req #print-area-req * {
+    /* ONLY show the dedicated print container and its contents */
+    #print-container, #print-container * {
         display: block !important;
         visibility: visible !important;
     }
-    body.is-printing-tags #print-area-tags,
-    body.is-printing-req #print-area-req {
+    #print-container {
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
-        margin: 0;
-        padding: 0;
     }
+    
+    /* Styles for the original report tabs when printed */
+     #print-container .header-container {
+        padding: 0 0 5px 0; margin-bottom: 8px; border-bottom: 1px solid #000;
+        text-align: center; color: #000; background: none;
+    }
+    #print-container #company-name, #print-container h2, #print-container h3 { color: #000; background: none; margin: 0; padding: 0; }
+    #print-container #company-name { font-size: 16pt; font-weight: bold; }
+    #print-container h2 { font-size: 13pt; }
+    #print-container h3 { font-size: 11pt; font-weight: bold; }
+    #print-container table { width: 100%; border-collapse: collapse; margin-bottom: 5px; table-layout: auto; }
+    #print-container tr { page-break-inside: avoid; }
+    #print-container th, #print-container td { border: 1px solid #333 !important; color: #000; font-size: 8.5pt; padding: 2px 3px; line-height: 1.1; background-color: #fff !important; word-wrap: break-word; }
+    #print-container th { font-weight: bold; background-color: #e0e0e0 !important; }
+    #print-container .section-header th { font-size: 10pt; text-align: center; }
 
-    /* --- SPECIFIC STYLES FOR TAGS PRINTING --- */
-    body.is-printing-tags .print-container {
+    /* --- SPECIFIC STYLES FOR TAGS WHEN PRINTING --- */
+    #print-container .print-container-tags {
         display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
         gap: 5mm; padding: 10mm; width: 210mm; height: 297mm; box-sizing: border-box;
     }
-    body.is-printing-tags .tag {
+    #print-container .tag {
         border: 2.5px solid #000; padding: 4mm; box-sizing: border-box; page-break-inside: avoid;
         font-size: 9pt; display: flex; flex-direction: column; justify-content: space-between;
     }
-    body.is-printing-tags .tag-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1.5px solid #000; padding-bottom: 6px; margin-bottom: 6px; }
-    body.is-printing-tags .tag-header .logo-area img { width: 65px; height: auto; }
-    body.is-printing-tags .tag-header .title-block { text-align: center; flex-grow: 1; padding: 0 5px; }
-    body.is-printing-tags .tag-header .title-block h3 { margin: 0; font-size: 14pt; font-weight: bold; }
-    body.is-printing-tags .tag-header .title-block .subtitle { margin: 0; font-size: 8pt; color: #333; }
-    body.is-printing-tags .tag-header .sop-block { text-align: right; font-size: 8pt; min-width: 75px; white-space: nowrap; }
-    body.is-printing-tags .tag-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 8.5pt; }
-    body.is-printing-tags .tag-body .field { display: flex; align-items: baseline; }
-    body.is-printing-tags .tag-body .field-label { font-weight: bold; margin-right: 5px; white-space: nowrap; }
-    body.is-printing-tags .tag-body .field-value { border-bottom: 1px dotted #000; width: 100%; min-height: 12px; }
-    body.is-printing-tags .tag-body .remarks-field { grid-column: 1 / -1; }
-    body.is-printing-tags .tag-footer { margin-top: auto; padding-top: 10px; display: flex; justify-content: flex-start; font-size: 8.5pt; border-top: 1px solid #000; }
+    #print-container .tag-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1.5px solid #000; padding-bottom: 6px; margin-bottom: 6px; }
+    #print-container .tag-header .logo-area img { width: 65px; height: auto; }
+    #print-container .tag-header .title-block { text-align: center; flex-grow: 1; padding: 0 5px; }
+    #print-container .tag-header .title-block h3 { margin: 0; font-size: 14pt; font-weight: bold; }
+    #print-container .tag-header .title-block .subtitle { margin: 0; font-size: 8pt; color: #333; }
+    #print-container .tag-header .sop-block { text-align: right; font-size: 8pt; min-width: 75px; white-space: nowrap; }
+    #print-container .tag-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 8.5pt; }
+    #print-container .tag-body .field { display: flex; align-items: baseline; }
+    #print-container .tag-body .field-label { font-weight: bold; margin-right: 5px; white-space: nowrap; }
+    #print-container .tag-body .field-value { border-bottom: 1px dotted #000; width: 100%; min-height: 12px; }
+    #print-container .tag-body .remarks-field { grid-column: 1 / -1; }
+    #print-container .tag-footer { margin-top: auto; padding-top: 10px; display: flex; justify-content: flex-start; font-size: 8.5pt; border-top: 1px solid #000; }
     
-    /* --- SPECIFIC STYLES FOR REQUISITION PRINTING --- */
-    body.is-printing-req #print-area-req { padding: 1cm; font-size: 9px; box-sizing: border-box; }
-    body.is-printing-req .requisition-form { border: 1px solid #000; padding: 15px; margin: 0; box-shadow: none; background: white; }
-    body.is-printing-req h2 { font-size: 16px; margin: 0 0 15px 0; padding-bottom: 8px; text-align: center; border-bottom: 2px solid #000; color: #000; }
-    body.is-printing-req h3 { font-size: 12px; margin: 15px 0 5px 0; color: #000; }
-    body.is-printing-req .form-group { margin-bottom: 6px; }
-    body.is-printing-req .form-group label { flex: 0 0 100px; font-size: 9px; }
-    body.is-printing-req .form-group input, 
-    body.is-printing-req .form-group textarea { border-bottom: 1px dotted #000; padding: 2px 0; font-size: 9px; background: none; }
-    body.is-printing-req table { table-layout: fixed; }
-    body.is-printing-req td, body.is-printing-req th { padding: 4px; font-size: 8px; }
-    body.is-printing-req table th:nth-child(1) { width: 4%; }
-    body.is-printing-req table th:nth-child(2) { width: 30%; }
-    body.is-printing-req table th:nth-child(3) { width: 20%; }
-    body.is-printing-req table th:nth-child(4) { width: 10%; }
-    body.is-printing-req table th:nth-child(5) { width: 8%; }
-    body.is-printing-req table th:nth-child(6) { width: 28%; }
-    body.is-printing-req .signature-area { margin-top: 25px; }
-    body.is-printing-req .signature-block p { font-size: 10px; }
+    /* --- SPECIFIC STYLES FOR REQUISITION WHEN PRINTING --- */
+    #print-container .requisition-form {
+        border: 1px solid #000; padding: 15px; margin: 1cm; box-shadow: none; background: white; font-size: 9px;
+    }
+    #print-container .requisition-form h2 { font-size: 16px; margin: 0 0 15px 0; padding-bottom: 8px; text-align: center; border-bottom: 2px solid #000; color: #000; }
+    #print-container .requisition-form h3 { font-size: 12px; margin: 15px 0 5px 0; color: #000; }
+    #print-container .requisition-form .form-group { margin-bottom: 6px; }
+    #print-container .requisition-form .form-group label { flex: 0 0 100px; font-size: 9px; }
+    #print-container .requisition-form input, 
+    #print-container .requisition-form textarea { border: none !important; border-bottom: 1px dotted #000 !important; padding: 2px 0 !important; font-size: 9px !important; background: none !important; -webkit-print-color-adjust: exact; }
+    #print-container .requisition-form table { table-layout: fixed; }
+    #print-container .requisition-form td, 
+    #print-container .requisition-form th { padding: 4px; font-size: 8px; }
+    #print-container .requisition-form .no-print { display: none !important; }
+    #print-container .requisition-form .signature-area { margin-top: 25px; }
+    #print-container .requisition-form .signature-block p { font-size: 10px; }
 }
