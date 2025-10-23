@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISAQ PHARMACEUTICALS - LIMS (Validated)</title>
+    <!-- External Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Your Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Tab Bar -->
+    <div class="tab-bar no-print">
+        <button class="tab-button active" data-tab="daily-activity"><i class="fas fa-calendar-day"></i> Daily Activity Report</button>
+        <button class="tab-button" data-tab="sterility-log"><i class="fas fa-vial-virus"></i> Sterility Test Log</button>
+        <button class="tab-button" data-tab="lab-ledger"><i class="fas fa-book"></i> Lab Chemical Ledger</button>
+        <!-- NEW TABS ADDED HERE -->
+        <button class="tab-button" data-tab="label-generator"><i class="fas fa-tags"></i> Label Generator</button>
+        <button class="tab-button" data-tab="purchase-requisition"><i class="fas fa-shopping-cart"></i> Purchase Requisition</button>
+    </div>
+
+    <!-- DAILY ACTIVITY TAB -->
+    <div id="daily-activity-content" class="tab-content active">
+        <div class="header-container"><h1 id="company-name" contenteditable="true">MISAQ PHARMACEUTICALS</h1><h2>QUALITY CONTROL DEPARTMENT</h2><h3>DAILY PERFORMANCE REPORT</h3></div>
+        <div class="controls no-print">
+            <label>Date:</label><input type="text" id="report-date" class="flatpickr-input">
+            <label>Report History:</label><select id="history-select"></select>
+            <button class="print-btn" onclick="prepareAndPrint()"><i class="fas fa-print"></i> Print Report</button>
+        </div>
+        <div id="print-report-date-container" class="print-only">Report Date: <span id="print-report-date"></span></div>
+        <table class="daily-activity-table">
+            <thead><tr class="section-header"><th colspan="9">Chemical Testing Section</th></tr><tr><th>Sr#</th><th>Product Name</th><th>B#</th><th>Stage</th><th>Activity</th><th>Status</th><th>Section</th><th>Performed By</th><th>Remarks</th><th class="action-column no-print">Action</th></tr></thead>
+            <tbody id="chemical-table-body"></tbody>
+        </table>
+        <div class="controls no-print" style="justify-content: flex-start;"><button class="add-btn" data-action="add-row" data-table="chemical-table-body"><i class="fas fa-plus"></i> Add Row</button></div>
+        <table class="daily-activity-table">
+            <thead><tr class="section-header"><th colspan="9">Microbiology Section</th></tr><tr><th>Sr#</th><th>Product Name</th><th>B#</th><th>Stage</th><th>Activity</th><th>Status</th><th>Section</th><th>Performed By</th><th>Remarks</th><th class="action-column no-print">Action</th></tr></thead>
+            <tbody id="micro-table-body"></tbody>
+        </table>
+        <div class="signature-section print-only">
+            <div class="signature-block"><div class="signature-line"></div><strong>Prepared by:</strong></div>
+            <div class="signature-block"><div class="signature-line"></div><strong>Approved by:</strong></div>
+        </div>
+    </div>
+    
+    <!-- STERILITY LOG TAB -->
+    <div id="sterility-log-content" class="tab-content">
+        <div class="header-container"><h1>Sterility Test Record</h1></div>
+        <div class="controls no-print">
+            <input type="text" id="sterility-search" placeholder="Search by Product or Batch..." style="flex-grow: 1; max-width: 400px;">
+            <button class="add-btn" data-action="show-sterility-modal"><i class="fas fa-plus"></i> Add New Test</button>
+            <button class="print-btn" onclick="window.print()"><i class="fas fa-print"></i> Print Log</button>
+        </div>
+        <table>
+            <thead><tr><th>Sr#</th><th>Date</th><th>Product Name</th><th>Batch No.</th><th>Activity</th><th>End Date</th><th>Release Date</th><th>Sterility Status</th><th>BET Status</th><th>Remarks</th><th class="action-column no-print">Actions</th></tr></thead>
+            <tbody id="sterility-table-body"></tbody>
+        </table>
+    </div>
+
+    <!-- LAB LEDGER TAB -->
+    <div id="lab-ledger-content" class="tab-content">
+        <h2>Lab Chemical Ledger</h2>
+        <div class="controls-grid">
+            <button id="recordTestBtn" class="primary-action-btn"><i class="fas fa-flask"></i> Record Test Usage</button>
+            <button id="addReceiveBtn"><i class="fas fa-plus"></i> Add New Chemical Batch</button>
+            <button id="printMasterListBtn" class="print-btn"><i class="fas fa-print"></i> Print Master Inventory</button>
+            <button id="printLedgerBtn" class="print-btn"><i class="fas fa-print"></i> Print Full Ledger</button>
+            <button id="printLowStockBtn" class="print-btn"><i class="fas fa-print"></i> Print Low Stock List</button>
+            <button id="printExpiredBtn" class="print-btn" style="background-color: var(--danger-color);"><i class="fas fa-exclamation-triangle"></i> Print Expired List</button>
+        </div>
+        
+        <h3 style="margin-top: 30px;">Current Inventory</h3>
+        <input type="text" id="inventorySearch" placeholder="Search Inventory by Name or ID..." style="margin-bottom: 15px;">
+        
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Chemical Name</th>
+                    <th>CAS</th>
+                    <th>Total Quantity</th>
+                    <th>Locations</th>
+                    <th>Status</th>
+                    <th class="no-print">Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h3 style="margin-top: 30px;">Usage History Log</h3>
+        <input type="text" id="historyFilter" placeholder="Search Usage History by Batch, Test, or Chemical Name...">
+        <table id="historyTable">
+            <thead><tr><th>Date</th><th>Chemical</th><th>Amount Used</th><th>Test</th><th>Batch #</th><th class="no-print">Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- NEW: LABEL GENERATOR TAB -->
+    <div id="label-generator-content" class="tab-content">
+        <div id="main-container" class="container">
+            <h1>Advanced QC Pharmaceutical Label Generator</h1>
+            <h2>Company Details (Saved Automatically)</h2>
+            <div class="form-section">
+                <div class="form-group"><label for="company-name-tags">Company Name:</label><input type="text" id="company-name-tags" placeholder="Enter your company name"></div>
+                <div class="form-group"><label for="logo-upload">Company Logo:</label><input type="file" id="logo-upload" accept="image/*"></div>
+                <div class="form-group"><label>Logo Preview:</label><img id="logo-preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Logo Preview"></div>
+            </div>
+            <hr>
+            <h2>History</h2>
+            <div class="form-section">
+                 <div class="form-group">
+                    <label for="history-select-tags">Load Saved Entry:</label>
+                    <select id="history-select-tags"></select>
+                </div>
+                <div class="form-group" style="flex-direction: row; align-items: flex-end; gap: 10px;">
+                    <button id="btn-load-history" title="Load the selected entry from the dropdown">Load from History</button>
+                    <button id="btn-save-history" title="Save the current form data to history">Save to History</button>
+                    <button id="btn-delete-history" title="Delete the selected entry from the dropdown">Delete Selected</button>
+                </div>
+            </div>
+            <hr>
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="label-type">Select Label Type:</label>
+                    <select id="label-type">
+                        <option value="raw-material">Raw Material</option>
+                        <option value="packing-material">Packing Material</option>
+                        <option value="finished-product">In-Process / Finished Product</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tag-status">Select Status:</label>
+                    <select id="tag-status">
+                        <option value="released">Released</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="sampled" id="sampled-option">Sampled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="total-container-count">Total # of Containers:</label>
+                    <input type="number" id="total-container-count" min="1" value="6" required>
+                </div>
+                <div class="form-group">
+                    <label for="tags-to-print">Container #s to Print:</label>
+                    <input type="text" id="tags-to-print" placeholder="e.g., 1-5, 8, 12">
+                </div>
+            </div>
+            <!-- Raw Material Form -->
+            <div id="raw-material-form" class="form-wrapper">
+                <h2>Raw Material Details</h2>
+                <div class="form-section" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="form-group"><label for="rm-sop-approved">Release Doc No:</label><input type="text" id="rm-sop-approved" class="sop-input" value="MP/QC/SOP/002/L"></div>
+                    <div class="form-group"><label for="rm-sop-rejected">Reject Doc No:</label><input type="text" id="rm-sop-rejected" class="sop-input" value="MP/QC/SOP/002/I"></div>
+                    <div class="form-group"><label for="rm-sop-sampled">Sampled Doc No:</label><input type="text" id="rm-sop-sampled" class="sop-input" value="MP/QC/SOP/002/M"></div>
+                </div>
+                <div class="form-section">
+                    <div class="form-group"><label for="rm-qc-no">QC #:</label><input type="text" id="rm-qc-no" class="history-field"></div>
+                    <div class="form-group"><label for="rm-product-name">Product Name:</label><input type="text" id="rm-product-name" class="history-field"></div>
+                    <div class="form-group"><label for="rm-batch-no">Batch #:</label><input type="text" id="rm-batch-no" class="history-field"></div>
+                    <div class="form-group"><label for="rm-mfg-date">MFG Date:</label><input type="text" id="rm-mfg-date" class="history-field" value="N/A"></div>
+                    <div class="form-group"><label for="rm-exp-date">EXP. Date:</label><input type="text" id="rm-exp-date" class="history-field"></div>
+                    <div class="form-group"><label for="rm-batch-size">Batch Size:</label><input type="text" id="rm-batch-size" class="history-field"></div>
+                    <div class="form-group"><label for="rm-test-date">Test Date:</label><input type="date" id="rm-test-date" class="history-field"></div>
+                    <div class="form-group"><label for="rm-release-date">Release Date:</label><input type="date" id="rm-release-date" class="history-field"></div>
+                    <div class="form-group"><label for="rm-manufacturer">Manufacturer:</label><input type="text" id="rm-manufacturer" class="history-field"></div>
+                    <div class="form-group"><label for="rm-remarks">Remarks:</label><input type="text" id="rm-remarks" class="remarks-input history-field"></div>
+                </div>
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="rm-params-select">Select Test Parameters:</label>
+                        <select id="rm-params-select" multiple class="history-field">
+                            <option value="Appearance">Appearance</option><option value="Identification">Identification</option><option value="Assay">Assay</option><option value="Assay on anhydrous basis">Assay on anhydrous basis</option><option value="Assay on as is basis">Assay on as is basis</option><option value="Assay on dried basis">Assay on dried basis</option><option value="Loss on drying">Loss on drying</option><option value="Heavy metals">Heavy metals</option><option value="Residue on ignition">Residue on ignition</option>
+                        </select>
+                    </div>
+                    <div id="rm-dynamic-params-container" class="form-group" style="gap: 15px;"></div>
+                </div>
+            </div>
+            <!-- Packing Material Form -->
+            <div id="packing-material-form" class="form-wrapper hidden">
+                <h2>Packing Material Details</h2>
+                <div class="form-section">
+                    <div class="form-group"><label for="pm-sop-approved">Release Doc No:</label><input type="text" id="pm-sop-approved" class="sop-input" value="MP/QC/SOP/002/J"></div>
+                    <div class="form-group"><label for="pm-sop-rejected">Reject Doc No:</label><input type="text" id="pm-sop-rejected" class="sop-input" value="MP/QC/SOP/002/K"></div>
+                </div>
+                 <div class="form-section">
+                    <div class="form-group"><label for="pm-qc-no">QC #:</label><input type="text" id="pm-qc-no" class="history-field"></div>
+                    <div class="form-group"><label for="pm-item-name">Item Name:</label><input type="text" id="pm-item-name" class="history-field"></div>
+                    <div class="form-group"><label for="pm-batch-lot-no">Batch Lot #:</label><input type="text" id="pm-batch-lot-no" class="history-field"></div>
+                    <div class="form-group"><label for="pm-total-qty">Total Quantity:</label><input type="text" id="pm-total-qty" class="history-field"></div>
+                    <div class="form-group"><label for="pm-receiving-date">Receiving Date:</label><input type="date" id="pm-receiving-date" class="history-field"></div>
+                    <div class="form-group"><label for="pm-test-date">Test Date:</label><input type="date" id="pm-test-date" class="history-field"></div>
+                    <div class="form-group"><label for="pm-release-date">Release Date:</label><input type="date" id="pm-release-date" class="history-field"></div>
+                    <div class="form-group"><label for="pm-supplier">Origin/Supplier:</label><input type="text" id="pm-supplier" class="history-field"></div>
+                    <div class="form-group"><label for="pm-remarks">Remarks:</label><input type="text" id="pm-remarks" class="remarks-input history-field"></div>
+                </div>
+            </div>
+            <!-- Finished Product Form -->
+            <div id="finished-product-form" class="form-wrapper hidden">
+                <h2>In-Process / Finished Product Details</h2>
+                 <div class="form-section">
+                    <div class="form-group"><label for="fp-sop-approved">Release Doc No:</label><input type="text" id="fp-sop-approved" class="sop-input" value="MP/QC/SOP/002/G"></div>
+                    <div class="form-group"><label for="fp-sop-rejected">Reject Doc No:</label><input type="text" id="fp-sop-rejected" class="sop-input" value="MP/QC/SOP/002/H"></div>
+                </div>
+                <div class="form-section">
+                    <div class="form-group"><label for="fp-qc-no">QC #:</label><input type="text" id="fp-qc-no" class="history-field"></div>
+                    <div class="form-group"><label for="fp-product-name">Product Name:</label><input type="text" id="fp-product-name" class="history-field"></div>
+                    <div class="form-group"><label for="fp-batch-no">Batch #:</label><input type="text" id="fp-batch-no" class="history-field"></div>
+                    <div class="form-group"><label for="fp-mfg-date">MFG Date:</label><input type="date" id="fp-mfg-date" class="history-field"></div>
+                    <div class="form-group"><label for="fp-exp-date">EXP Date:</label><input type="date" id="fp-exp-date" class="history-field"></div>
+                    <div class="form-group"><label for="fp-batch-size">Batch Size:</label><input type="text" id="fp-batch-size" class="history-field"></div>
+                    <div class="form-group"><label for="fp-test-date">Test Date:</label><input type="date" id="fp-test-date" class="history-field"></div>
+                    <div class="form-group"><label for="fp-release-date">Release Date:</label><input type="date" id="fp-release-date" class="history-field"></div>
+                    <div class="form-group"><label for="fp-remarks">Remarks:</label><input type="text" id="fp-remarks" class="remarks-input history-field"></div>
+                </div>
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="fp-params-select">Select Test Parameters:</label>
+                        <select id="fp-params-select" multiple class="history-field">
+                            <option value="pH">pH</option><option value="Dissolution">Dissolution</option><option value="Average weight">Average weight</option><option value="Start of compression">Start of compression</option><option value="End of compression">End of compression</option><option value="Start of encapsulation">Start of encapsulation</option><option value="End of encapsulation">End of encapsulation</option><option value="Start of filling">Start of filling</option><option value="End of filling">End of filling</option>
+                        </select>
+                    </div>
+                    <div id="fp-dynamic-params-container" class="form-group" style="gap: 15px;"></div>
+                </div>
+            </div>
+            <div class="button-container">
+                <button id="generate-tags">Generate Tags</button>
+            </div>
+        </div>
+        <div id="print-area-tags"></div>
+    </div>
+
+    <!-- NEW: PURCHASE REQUISITION TAB -->
+    <div id="purchase-requisition-content" class="tab-content">
+        <div id="print-area-req">
+            <div class="requisition-form" id="purchaseRequisitionForm">
+              <h2>LAB PURCHASE REQUISITION</h2>
+              <div class="form-group full-width">
+                <label for="requisitionNo">Requisition No.:</label>
+                <input type="text" id="requisitionNo" value="LR-001">
+              </div>
+              <div class="form-group full-width">
+                <label for="date-req">Date:</label>
+                <input type="date" id="date-req">
+              </div>
+              <div class="form-group full-width">
+                <label for="department">Department:</label>
+                <input type="text" id="department" value="QC Lab">
+              </div>
+              <div class="form-group full-width">
+                <label for="requestedBy">Prepared By:</label>
+                <input type="text" id="requestedBy" value="Fahad Nazeer">
+              </div>
+              <h3>Required Materials/Items:</h3>
+              <div class="table-container">
+                <table id="itemDetailsTable">
+                  <thead>
+                    <tr><th>S.No</th><th>Item Description</th><th>Brand/Manufacturer</th><th>Pack Size</th><th>Quantity</th><th>Remarks</th><th class="no-print">Action</th></tr>
+                  </thead>
+                  <tbody id="itemDetailsBody">
+                    <tr id="itemRow_0">
+                      <td>1</td>
+                      <td>
+                        <div class="autocomplete-container">
+                          <input type="text" id="itemDescription_0" class="item-description-input" data-row-index="0" value="Ethanol">
+                          <div id="autocomplete-list_0" class="autocomplete-items"></div>
+                        </div>
+                      </td>
+                      <td id="brandCell_0"><input type="text" id="brand_0" value="Sigma-Aldrich" list="brandOptions_0"></td>
+                      <td><input type="text" id="packSize_0" value="500ml" list="packSizeOptions"></td>
+                      <td><input type="number" id="quantity_0" value="2"></td>
+                      <td><input type="text" id="remarks_0" value=""></td>
+                      <td><button class="danger delete-req-row" data-row-id="itemRow_0">Delete</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button class="add-row-btn primary" id="add-req-item-btn">Add Item</button>
+              </div>
+              <div class="signature-area">
+                <div class="signature-block"><span class="signature-line"></span><p>Prepared By</p></div>
+                <div class="signature-block"><span class="signature-line"></span><p>Reviewed By</p></div>
+                <div class="signature-block"><span class="signature-line"></span><p>Approved By</p></div>
+              </div>
+              <div class="button-group no-print">
+                <button class="primary" id="save-req-btn">Save Requisition</button>
+                <button class="secondary" id="clear-req-btn">Clear Form</button>
+                <button class="secondary" id="print-req-btn">Print Requisition</button>
+              </div>
+            </div>
+        </div>
+          <!-- History Section -->
+        <div class="history-section no-print">
+            <h2>Purchase Requisition History</h2>
+            <table id="historyTable-req">
+              <thead><tr><th>Requisition No.</th><th>Date</th><th>Department</th><th>Prepared By</th><th>Action</th></tr></thead>
+              <tbody id="historyBody-req"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- All Modals for all tabs -->
+<div id="sterility-modal" class="modal no-print">
+    <div class="modal-content">
+        <h2 id="modal-title">Add New Sterility Test</h2>
+        <form id="sterility-form">
+            <input type="hidden" id="sterility-id">
+            <div class="form-grid">
+                <div><label for="s-date">Date</label><input type="text" id="s-date" class="flatpickr-input" required></div>
+                <div><label for="s-productName">Product Name</label><input type="text" id="s-productName" required></div>
+                <div><label for="s-batchNumber">Batch No.</label><input type="text" id="s-batchNumber" required></div>
+                <div><label for="s-activity">Activity</label><input type="text" id="s-activity" value="Sterility Test"></div>
+                <div><label for="s-endDate">End Date</label><input type="text" id="s-endDate" class="flatpickr-input"></div>
+                <div><label for="s-releaseDate">Release Date</label><input type="text" id="s-releaseDate" class="flatpickr-input"></div>
+                <div><label for="s-sterilityStatus">Sterility Status</label><select id="s-sterilityStatus"><option>Pass</option><option>Fail</option><option>In-Progress</option></select></div>
+                <div><label for="s-betStatus">BET Status</label><select id="s-betStatus"><option>Pass</option><option>Fail</option><option>In-Progress</option></select></div>
+                <div class="full-width"><label for="s-remarks">Remarks</label><input type="text" id="s-remarks"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" data-action="close-modal">Cancel</button>
+                <button type="submit" class="save-btn"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="addReceiveModal" class="modal no-print">
+    <div class="modal-content"><span class="close-btn" data-action="close-modal">&times;</span><h2 id="addReceiveTitle">Add New Chemical Batch</h2>
+    <form id="addReceiveForm">
+        <div class="form-grid">
+            <div><label>Chemical ID</label><input type="number" id="stockId" placeholder="e.g., 101" required></div>
+            <div><label>Chemical Name</label><input type="text" id="stockName" placeholder="Auto-fills for known ID" required></div>
+            <div><label>Batch Number</label><input type="text" id="stockBatchNumber" placeholder="e.g., B202501" required></div>
+            <div><label>Expiry Date</label><input type="text" id="stockExpiryDate" placeholder="Select a date" required></div>
+            <div><label>CAS Number</label><input type="text" id="stockCas" placeholder="Auto-fills for known ID"></div>
+            <div><label>Quantity Received</label><input type="number" id="stockQuantity" required min="0" step="any"></div>
+            <div><label>Unit</label><select id="stockBaseUnit" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="mL">mL</option></select></div>
+            <div><label>Low Stock Level (in base unit)</label><input type="number" id="stockReorderLevel" required min="0" step="any"></div>
+            <div class="full-width"><label>Storage Location</label><input type="text" id="stockLocation" value="Chemical Room"></div>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="cancel-btn" data-action="close-modal">Cancel</button>
+            <button type="submit" id="addReceiveSubmitBtn">Add New Batch</button>
+        </div>
+    </form></div>
+</div>
+<div id="testUsageModal" class="modal no-print">
+    <div class="modal-content">
+        <span class="close-btn" data-action="close-modal">&times;</span>
+        <h2>Record Usage for a Test / Batch</h2>
+        <form id="testUsageForm">
+            <div class="form-grid">
+                <div class="full-width"><label>Product / Test Name</label><input type="text" id="testName" placeholder="e.g., Paracetamol Assay" required></div>
+                <div class="full-width"><label>Batch Number (of Product)</label><input type="text" id="batchNumber" placeholder="e.g., PC2025-001" required></div>
+            </div>
+            <h3 style="margin-top:20px;">Chemicals Used</h3>
+            <div id="chemical-entry-container">
+                <!-- Chemical entry rows will be dynamically added by JS -->
+            </div>
+            <button type="button" id="addChemicalRowBtn" class="add-btn"><i class="fas fa-plus"></i> Add More Chemicals</button>
+            <div style="margin-top:20px;"></div>
+            <button type="submit" class="primary-action-btn" style="width:100%;">Submit & Deduct All</button>
+        </form>
+    </div>
+</div>
+<div id="editChemicalModal" class="modal no-print">
+    <div class="modal-content"><span class="close-btn" data-action="close-modal">&times;</span><h2>Edit Chemical Details</h2>
+    <form id="editChemicalForm">
+        <input type="hidden" id="editChemicalFbId">
+        <div class="form-group"><label>Chemical ID (Read-only)</label><input type="number" id="editChemicalId" readonly></div>
+        <div class="form-group"><label>Chemical Name</label><input type="text" id="editChemicalName" required></div>
+        <div class="form-group"><label>Batch Number</label><input type="text" id="editBatchNumber" required></div>
+        <div class="form-group"><label>Expiry Date</label><input type="text" id="editExpiryDate" required></div>
+        <div class="form-group"><label>CAS Number</label><input type="text" id="editCasNumber"></div>
+        <div class="form-group"><label>Current Quantity (Editable)</label><input type="number" id="editChemicalQuantity" step="any" required></div>
+        <div class="form-group"><label>Low Stock Level</label><input type="number" id="editReorderLevel" required min="0" step="any"></div>
+        <div class="form-group"><label>Storage Location</label><input type="text" id="editLocation"></div>
+        <button type="submit">Save Changes</button>
+    </form></div>
+</div>
+<div id="editHistoryModal" class="modal no-print">
+    <div class="modal-content"><span class="close-btn" data-action="close-modal">&times;</span><h2>Edit Usage History Entry</h2>
+    <form id="editHistoryForm">
+        <input type="hidden" id="editHistoryId">
+        <div class="form-group"><label>Chemical (Read-only)</label><input type="text" id="editHistoryChemical" readonly></div>
+        <div class="form-row">
+            <div class="form-group"><label>Amount Used (Editable)</label><input type="number" id="editHistoryAmount" step="any" required></div>
+            <div class="form-group"><label>Unit</label><select id="editHistoryUnit" required><option value="mg">mg</option><option value="g">g</option><option value="mL">mL</option><option value="L">L</option></select></div>
+        </div>
+        <div class="form-group"><label>Test / Product Name</label><input type="text" id="editHistoryTestName" required></div>
+        <div class="form-group"><label>Batch Number</label><input type="text" id="editHistoryBatchNumber" required></div>
+        <button type="submit">Save Changes</button>
+    </form></div>
+</div>
+
+<div id="autocomplete-box" class="autocomplete-container no-print"></div>
+<div id="connection-status" class="connection-status no-print">Connecting...</div>
+<div class="print-area" style="display:none;"></div>
+
+<!-- Datalists for Requisition Form -->
+<datalist id="unitOptions">
+    <option value="Bag"></option><option value="Bottle"></option><option value="Box"></option><option value="Case"></option><option value="Each (EA)"></option><option value="Grams (g)"></option><option value="Kilograms (kg)"></option><option value="Kit"></option><option value="Liters (L)"></option><option value="Milliliters (mL)"></option><option value="Pack"></option><option value="Roll"></option>
+</datalist>
+<datalist id="packSizeOptions">
+    <option value="100g"></option><option value="500g"></option><option value="1kg"></option><option value="5kg"></option><option value="250ml"></option><option value="500ml"></option><option value="1L"></option><option value="2.5L"></option><option value="4L"></option><option value="Pack of 10"></option><option value="Pack of 50"></option><option value="Pack of 100"></option><option value="Pack of 500"></option><option value="Roll (10m)"></option><option value="Roll (50m)"></option>
+</datalist>
+
+<!-- Scripts -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="firebase-config.js"></script>
+<script src="ledger-app.js"></script>
+<script src="report-app.js"></script>
+<!-- NEW SCRIPT FILES -->
+<script src="tags-app.js"></script>
+<script src="requisition-app.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>
