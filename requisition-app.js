@@ -63,11 +63,9 @@ const requisitionApp = (() => {
           }
         });
 
-        // FIX: ROBUST PRINT CLEANUP
+        // This single listener will clean up the print container after any print job
         window.addEventListener('afterprint', () => {
-            if (document.body.classList.contains('is-printing-req')) {
-                document.body.classList.remove('is-printing-req');
-            }
+            document.getElementById('print-container').innerHTML = '';
         });
     }
 
@@ -128,21 +126,18 @@ const requisitionApp = (() => {
         
         closeAllLists(rowIndex);
 
-        // FIX: EXPLICITLY HIDE THE BOX IF THE INPUT IS EMPTY
         if (!searchTerm) {
-            autocompleteList.innerHTML = "";
-            autocompleteList.style.display = "none";
+            autocompleteList.style.display = 'none';
             return;
         }
 
         const matchingItems = Object.keys(approvedItems).filter(item => item.toLowerCase().includes(searchTerm));
         if (matchingItems.length === 0) {
-            autocompleteList.innerHTML = "";
-            autocompleteList.style.display = "none";
+            autocompleteList.style.display = 'none';
             return;
         }
 
-        autocompleteList.innerHTML = ""; // Clear previous results
+        autocompleteList.innerHTML = "";
         autocompleteList.style.display = "block";
         matchingItems.forEach(item => {
             const itemDiv = document.createElement("DIV");
@@ -278,8 +273,20 @@ const requisitionApp = (() => {
     }
 
     function printRequisition() {
-        // The afterprint event listener will handle removing the class
-        document.body.classList.add('is-printing-req');
+        const formToPrint = document.getElementById('purchaseRequisitionForm');
+        const printContainer = document.getElementById('print-container');
+        
+        const clonedForm = formToPrint.cloneNode(true);
+        
+        const originalInputs = formToPrint.querySelectorAll('input, textarea');
+        const clonedInputs = clonedForm.querySelectorAll('input, textarea');
+        originalInputs.forEach((input, index) => {
+            clonedInputs[index].value = input.value;
+        });
+
+        printContainer.innerHTML = '';
+        printContainer.appendChild(clonedForm);
+        
         window.print();
     }
 
